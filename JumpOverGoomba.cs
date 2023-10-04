@@ -2,12 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEditor.Build.Content;
 
 public class JumpOverGoomba : MonoBehaviour
 {
     public Transform enemyLocation;
     public TextMeshProUGUI scoreText;
-    public TextMeshProUGUI scoreTextOver;
+
+
     private bool onGroundState;
 
     [System.NonSerialized]
@@ -18,9 +20,13 @@ public class JumpOverGoomba : MonoBehaviour
     public float maxDistance;
     public LayerMask layerMask;
 
+
+    GameManager gameManager;
+
     // Start is called before the first frame update
     void Start()
     {
+        gameManager = GameObject.FindGameObjectWithTag("Manager").GetComponent<GameManager>();
 
     }
 
@@ -40,7 +46,7 @@ public class JumpOverGoomba : MonoBehaviour
     }
 
 
-    void FixedUpdate()
+    /*void FixedUpdate()
     {
         // mario jumps
         if (Input.GetKeyDown("space") && onGroundCheck())
@@ -55,18 +61,55 @@ public class JumpOverGoomba : MonoBehaviour
             if (Mathf.Abs(transform.position.x - enemyLocation.position.x) < 0.5f)
             {
                 countScoreState = false;
-                score++;
+                gameManager.IncreaseScore(1)
+
+
+                /*score++;
                 scoreText.text = "Score: " + score.ToString();
                 scoreTextOver.text = "Score: " + score.ToString();
                 Debug.Log(score);
             }
         }
+    }*/
+
+    void FixedUpdate()
+    {
+        // when jumping, and Goomba is near Mario and we haven't registered our score
+
+        if (Input.GetKeyDown("space") && onGroundCheck())
+        {
+            onGroundState = false;
+            countScoreState = true;
+        }
+        if (!onGroundState && countScoreState)
+        {
+            //scoring when jump over goomba
+            /*if (Mathf.Abs(transform.position.x - enemyLocation.position.x) < 0.5f)
+            {
+                countScoreState = false;
+                gameManager.IncreaseScore(1);
+                Debug.Log(score);
+
+            }*/
+
+
+        }
+
     }
+
 
     void OnCollisionEnter2D(Collision2D col)
     {
         if (col.gameObject.CompareTag("Ground")) onGroundState = true;
+        if (col.gameObject.CompareTag("Enemy") && col.contacts[0].normal.y > 0.5f)
+        {
+            countScoreState = false;
+            //gameManager.IncreaseScore(1);
+            //Debug.Log(score);
+
+        }
     }
+
 
 
     private bool onGroundCheck()

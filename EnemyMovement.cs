@@ -12,7 +12,21 @@ public class EnemyMovement : MonoBehaviour
     private Vector2 velocity;
     public Vector3 startPosition = new Vector3(0.0f, 0.0f, 0.0f);
 
+    public Animator GoombaAnimator;
+
     private Rigidbody2D enemyBody;
+
+
+
+
+    public void GameRestart()
+    {
+        transform.localPosition = startPosition;
+        originalX = transform.position.x;
+        moveRight = -1;
+        GoombaAnimator.SetTrigger("GameRestart");
+        ComputeVelocity();
+    }
 
     void Start()
     {
@@ -25,21 +39,30 @@ public class EnemyMovement : MonoBehaviour
     void OnTriggerEnter2D(Collider2D other)
     {
         Debug.Log(other.gameObject.name);
+        Vector2 contactNormal = other.transform.position - transform.position;
+        if (other.gameObject.CompareTag("Player") && !(Mathf.Abs(contactNormal.x) > 0.5f))
+        {
+            GoombaAnimator.Play("GoombaStompped");
+        }
     }
     void ComputeVelocity()
     {
         velocity = new Vector2((moveRight) * maxOffset / enemyPatroltime, 0);
+
     }
     void Movegoomba()
     {
         enemyBody.MovePosition(enemyBody.position + velocity * Time.fixedDeltaTime);
+
     }
 
     void Update()
     {
         if (Mathf.Abs(enemyBody.position.x - originalX) < maxOffset)
         {// move goomba
+
             Movegoomba();
+
         }
         else
         {
@@ -48,5 +71,6 @@ public class EnemyMovement : MonoBehaviour
             ComputeVelocity();
             Movegoomba();
         }
+
     }
 }
